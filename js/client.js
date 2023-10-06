@@ -25,7 +25,7 @@ class Client {
 				pos: this.pos,
 				angle: this.angle
 			};
-			socket.send(JSON.stringify(data));
+			socket.emit(JSON.stringify(data));
 		} else if (this.pos.x !== this.prevPos.x || this.pos.y !== this.prevPos.y || this.angle !== this.prevAngle) {
             const data = {
 				type: 'updatePlayer',
@@ -35,7 +35,7 @@ class Client {
             };
 
             // Send updated data to the server
-            socket.send(JSON.stringify(data));
+            socket.emit(JSON.stringify(data));
 
             // Update previous position and angle
             this.prevPos.set(this.pos);
