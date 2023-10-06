@@ -11,47 +11,47 @@ class Client {
     }
   
     handleInput() {
-    	let localAcceleration = createVector(0, 0);
-
-    	if (keyIsDown(37)) {
-    	  this.angle -= this.rotationSpeed; // Turn left
-    	}
-    	if (keyIsDown(39)) {
-    	  this.angle += this.rotationSpeed; // Turn right
-    	}
-    	if (keyIsDown(38)) {
-    	  localAcceleration.y -= this.acceleration * dt; // Accelerate forward
-    	}
-    	if (keyIsDown(40)) {
-    	  localAcceleration.y += this.acceleration * dt; // Accelerate backward
-    	}
-
-    	// Deceleration when no keys are pressed
-    	if (!keyIsDown(38) && !keyIsDown(40)) {
-    	  let currentSpeedDirection = this.currentSpeed.copy().normalize();
-    	  let decelerationMagnitude = this.deceleration * dt;
-    	  let decelerationVector = currentSpeedDirection.mult(decelerationMagnitude);
-
-    	  // Apply deceleration in the opposite direction of the current speed
-    	  this.currentSpeed.sub(decelerationVector);
-    	}
-
-    	let rotationVector = createVector(cos(this.angle), sin(this.angle));
-    	let turningRadius = this.size / tan(this.rotationSpeed / 2);
+		let localAcceleration = createVector(0, 0);
+		let speed = this.currentSpeed.mag();
 	
-    	let radialAcceleration = p5.Vector.mult(rotationVector, localAcceleration.y);
-    	radialAcceleration.rotate(HALF_PI); // Rotate by 90 degrees for perpendicular direction
-    	radialAcceleration.setMag(turningRadius);
-    	    if (!(keyIsDown(37) || keyIsDown(39)) || keyIsDown(SHIFT)) {
-    	        console.log("limiting");
-    	        radialAcceleration.limit(this.acceleration * dt);
-    	    }
+		if (keyIsDown(37)) {
+			this.angle -= this.rotationSpeed * (speed / this.maxSpeed);
+		}
+		if (keyIsDown(39)) {
+			this.angle += this.rotationSpeed * (speed / this.maxSpeed);
+		}
+		if (keyIsDown(38)) {
+			localAcceleration.y -= (this.acceleration + speed * 0.1) * dt;
+		}
+		if (keyIsDown(40)) {
+			localAcceleration.y += (this.acceleration + speed * 0.1) * dt;
+		}
+	
+		if (!keyIsDown(38) && !keyIsDown(40)) {
+			let currentSpeedDirection = this.currentSpeed.copy().normalize();
+			let decelerationMagnitude = (this.deceleration + speed * 0.1) * dt;
+			let decelerationVector = currentSpeedDirection.mult(decelerationMagnitude);
+	
+			this.currentSpeed.sub(decelerationVector);
+		}
+	
+		let rotationVector = createVector(cos(this.angle), sin(this.angle));
 
-    	this.currentSpeed.add(radialAcceleration);
-    	this.currentSpeed.limit(this.maxSpeed);
-
-    	this.pos.add(p5.Vector.mult(this.currentSpeed, dt));
-    }
+		let speedFactor = 0.0000000001;
+		let turningRadius = this.size / (tan(this.rotationSpeed / 2) * sqrt(1 + speed * speed * speedFactor));
+	
+		let radialAcceleration = p5.Vector.mult(rotationVector, localAcceleration.y);
+		radialAcceleration.rotate(HALF_PI);
+		radialAcceleration.setMag(turningRadius);
+		radialAcceleration.limit((this.acceleration + speed * 0.1) * dt);
+	
+		this.currentSpeed.add(radialAcceleration);
+		this.currentSpeed.limit(this.maxSpeed);
+	
+		this.pos.add(p5.Vector.mult(this.currentSpeed, dt));
+	}
+	
+	
   
     display() {
     	push();

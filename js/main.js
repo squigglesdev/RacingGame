@@ -12,7 +12,7 @@ function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("game");
 
-  player = new Client(0, 0, 40, 500, 500, 300, 0.02);
+  player = new Client(0, 0, 40, 500, 500, 300, 0.01);
   camera = new Camera(0.1);
 }
 
@@ -27,9 +27,9 @@ function draw() {
 
   translate(width / 2 - camera.pos.x, height / 2 - camera.pos.y);
 
-  image(bg, -width / 2, -height / 2, 1000, 1000);
+  image(bg, -width / 2, -height / 2, 1000, 1500);
 
-  //drawGrid(camera.pos.x, camera.pos.y, width, height, gridSpacing);
+  //drawGrid(camera.pos.x, camera.pos.y, width, height, 20);
   
   player.display();
 }
