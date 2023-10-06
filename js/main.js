@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://longhope.ddns.net:8080")
+const socket = new WebSocket("wss://longhope.ddns.net:8080")
 
 let player;
 let camera;
