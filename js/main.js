@@ -13,6 +13,11 @@ let otherPlayers = [];
 // SOCKET EVENT HANDLERS //
 ///////////////////////////
 
+socket.addEventListener('open', function (event) {
+  // WebSocket connection is open, call the initialization function
+  initializeGame();
+});
+
 // Set up a listener for the 'message' event
 socket.addEventListener('message', function (event) {
   // Parse the received JSON data
@@ -75,17 +80,19 @@ function preload() {
   carSprite = loadImage("sprites/car.svg");
 }
 
-function setup() {
-  frameRate(165);
-  canvas = createCanvas(windowWidth, windowHeight);
-  canvas.parent("game");
-
+function initializeGame() {
   playerName = prompt("Enter your name: ");
 
   player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName);
   camera = new Camera(0.2);
 
   player.broadcastData(true);
+}
+
+function setup() {
+  frameRate(165);
+  canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent("game");
 }
 
 let gridSpacing = 40;
