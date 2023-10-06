@@ -1,5 +1,4 @@
-import 'socket.io';
-const socket = io();
+const socket = new WebSocket("wsz://longhope.ddns.net:8080")
 
 let player;
 let camera;
@@ -14,13 +13,16 @@ let otherPlayers = [];
 // SOCKET EVENT HANDLERS //
 ///////////////////////////
 
-socket.on('connect', () => {
+socket.addEventListener('open', function (event) {
   // WebSocket connection is open, call the initialization function
   initializeGame();
 });
 
 // Set up a listener for the 'message' event
-socket.on('message', (data) => {
+socket.addEventListener('message', function (event) {
+  // Parse the received JSON data
+  const data = JSON.parse(event.data);
+  //console.log(data);
 
   if (data.name !== playerName) {
     if (data.type === 'newPlayer') {
