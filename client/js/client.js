@@ -1,5 +1,7 @@
+
+
 class Client {
-    constructor(x, y, size, acceleration, deceleration, maxSpeed, rotationSpeed) {
+    constructor(x, y, size, acceleration, deceleration, maxSpeed, rotationSpeed, speedMultiplier, name) {
     	this.pos = createVector(x, y);
     	this.size = size;
     	this.acceleration = acceleration;
@@ -8,6 +10,37 @@ class Client {
     	this.currentSpeed = createVector(0, 0);
     	this.angle = 0;
     	this.rotationSpeed = rotationSpeed;
+		this.speedMultiplier = speedMultiplier;
+		this.prevPos = createVector(x, y);
+		this.prevAngle = this.angle;
+		this.name = name;
+    }
+
+	broadcastData(open) {
+        // Check if position or angle has changed
+		if (open) {
+			const data = {
+				type: 'newPlayer',
+				name: this.name,
+				pos: this.pos,
+				angle: this.angle
+			};
+			socket.send(JSON.stringify(data));
+		} else if (this.pos.x !== this.prevPos.x || this.pos.y !== this.prevPos.y || this.angle !== this.prevAngle) {
+            const data = {
+				type: 'updatePlayer',
+				name: this.name,
+                pos: this.pos,
+                angle: this.angle
+            };
+
+            // Send updated data to the server
+            socket.send(JSON.stringify(data));
+
+            // Update previous position and angle
+            this.prevPos.set(this.pos);
+            this.prevAngle = this.angle;
+        }
     }
   
     handleInput() {
@@ -47,8 +80,12 @@ class Client {
 	
 		this.currentSpeed.add(radialAcceleration);
 		this.currentSpeed.limit(this.maxSpeed);
+
+		if (Math.abs(this.currentSpeed.mag()) < 1) {
+			this.currentSpeed.setMag(0);
+		}
 	
-		this.pos.add(p5.Vector.mult(this.currentSpeed, dt));
+		this.pos.add(p5.Vector.mult(p5.Vector.mult(this.currentSpeed, dt), 2 * this.speedMultiplier));
 	}
 	
 	
@@ -58,7 +95,12 @@ class Client {
     	rectMode(CENTER);
     	translate(this.pos.x, this.pos.y);
     	rotate(this.angle);
-    	square(0, 0, this.size);
+    	//image(carSprite, 0, 0, this.size, this.size)
+		square(0, 0, this.size);
+		line(0, 0, 0, -this.size / 2);
     	pop();
+
+		//handle data broadcast
+		this.broadcastData(false);
     }
 }
