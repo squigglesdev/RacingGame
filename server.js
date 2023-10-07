@@ -32,6 +32,8 @@ wss.on('connection', (ws) => {
     });
 });
 
+console.log("Server started on port 8080");
+
 function broadcastNewPlayer(data) {
     // Broadcast new player information to all clients except the sender
     console.log("New player: " + data.name);
