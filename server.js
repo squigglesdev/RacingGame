@@ -32,7 +32,10 @@ wss.on('connection', (ws) => {
     });
 });
 
-console.log("Server started on port 8080");
+// console log when server is running
+wss.on('listening', () => {
+    console.log('Server listening on port 8080');
+});
 
 function broadcastNewPlayer(data) {
     // Broadcast new player information to all clients except the sender
