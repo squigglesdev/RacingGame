@@ -30,6 +30,60 @@ function preload() {
   carSprite = loadImage("sprites/car.svg");
 
   socket = new WebSocket("wss://server.squiggles.dev");
+  socket.addEventListener('open', function (event) {
+    // WebSocket connection is open, call the initialization function
+    initializeGame();
+  });
+
+  // Set up a listener for the 'message' event
+  socket.addEventListener('message', function (event) {
+    // Parse the received JSON data
+    const data = JSON.parse(event.data);
+    //console.log(data);
+
+    if (data.id !== playerName) {
+      if (data.type === 'newPlayer') {
+        handleNewPlayer(data);
+      } else if (data.type === 'updatePlayer') {
+        handleUpdatePlayer(data);
+      } else if (data.type === 'playerDisconnect') {
+        handlePlayerDisconnect(data);
+      }
+    }
+  });
+
+  function handleNewPlayer(data) {
+    // Create a new player object for the new player
+    otherPlayers[data.id] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.01, 1, data.name, data.id);
+    console.log(otherPlayers);
+  }
+
+  function handleUpdatePlayer(data) {
+    // Update the position and angle of an existing player
+    if (otherPlayers[data.id]) {
+      otherPlayers[data.id].pos.x = data.pos.x;
+      otherPlayers[data.id].pos.y = data.pos.y;
+      otherPlayers[data.id].angle = data.angle;
+    } else {
+      handleNewPlayer(data);
+    }
+  }
+
+  function handlePlayerDisconnect(data) {
+    // Remove the disconnected player from the local game state
+    if (otherPlayers[data.id]) {
+        delete otherPlayers[data.id];
+    }
+  }
+
+  window.addEventListener('beforeunload', function (event) {
+    // Send a disconnect message to the server
+    const disconnectMessage = {
+      type: 'disconnect',
+      id: player.id 
+    };
+    socket.send(JSON.stringify(disconnectMessage));
+  });
 
   playerName = prompt("Enter your name: ");
   playerid = makeid(20);
@@ -89,67 +143,4 @@ function drawGrid(x, y, canvasWidth, canvasHeight, spacing) {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-}
-
-///////////////////////////
-// SOCKET EVENT HANDLERS //
-///////////////////////////
-
-// only do all this once socket is defined
-if (socket !== undefined) {
-
-  socket.addEventListener('open', function (event) {
-    // WebSocket connection is open, call the initialization function
-    initializeGame();
-  });
-
-  // Set up a listener for the 'message' event
-  socket.addEventListener('message', function (event) {
-    // Parse the received JSON data
-    const data = JSON.parse(event.data);
-    //console.log(data);
-
-    if (data.id !== playerName) {
-      if (data.type === 'newPlayer') {
-        handleNewPlayer(data);
-      } else if (data.type === 'updatePlayer') {
-        handleUpdatePlayer(data);
-      } else if (data.type === 'playerDisconnect') {
-        handlePlayerDisconnect(data);
-      }
-    }
-  });
-
-  function handleNewPlayer(data) {
-    // Create a new player object for the new player
-    otherPlayers[data.id] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.01, 1, data.name, data.id);
-    console.log(otherPlayers);
-  }
-
-  function handleUpdatePlayer(data) {
-    // Update the position and angle of an existing player
-    if (otherPlayers[data.id]) {
-      otherPlayers[data.id].pos.x = data.pos.x;
-      otherPlayers[data.id].pos.y = data.pos.y;
-      otherPlayers[data.id].angle = data.angle;
-    } else {
-      handleNewPlayer(data);
-    }
-  }
-
-  function handlePlayerDisconnect(data) {
-    // Remove the disconnected player from the local game state
-    if (otherPlayers[data.id]) {
-        delete otherPlayers[data.id];
-    }
-  }
-
-  window.addEventListener('beforeunload', function (event) {
-    // Send a disconnect message to the server
-    const disconnectMessage = {
-      type: 'disconnect',
-      id: player.id 
-    };
-    socket.send(JSON.stringify(disconnectMessage));
-  });
 }
