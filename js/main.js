@@ -1,4 +1,4 @@
-const socket = new WebSocket("wss://server.squiggles.dev")
+let socket;
 
 let player;
 let camera;
@@ -87,6 +87,11 @@ function makeid(length) {
 function preload() {
   bgSprite = loadImage("sprites/road.svg");
   carSprite = loadImage("sprites/car.svg");
+
+  socket = new WebSocket("wss://server.squiggles.dev");
+
+  playerName = prompt("Enter your name: ");
+  playerid = makeid(20);
 }
 
 function initializeGame() {
