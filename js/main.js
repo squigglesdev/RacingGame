@@ -116,9 +116,10 @@ function draw() {
 
   translate(width / 2 - camera.pos.x, height / 2 - camera.pos.y);
 
-  //image(bgSprite, -width / 2, -height / 2, 2000, 3000);
-
   drawGrid(camera.pos.x, camera.pos.y, width, height, 40);
+
+  image(bgSprite, -width / 2, -height / 2, 2000, 3000);
+
   
   player.display();
 
