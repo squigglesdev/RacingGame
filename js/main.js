@@ -63,13 +63,22 @@ window.addEventListener('beforeunload', function (event) {
   // Send a disconnect message to the server
   const disconnectMessage = {
     type: 'disconnect',
-    name: player.name // Assuming 'player' is your local player object
+    id: player.id 
   };
   socket.send(JSON.stringify(disconnectMessage));
-
-  // Note: The actual message sent and the format may vary based on your server-side implementation.
-  // Ensure that the server understands and handles the 'disconnect' message correctly.
 });
+
+function makeid(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 
 /////////////////////
 // MAIN GAME LOOP //
@@ -82,9 +91,8 @@ function preload() {
 
 function initializeGame() {
   playerName = prompt("Enter your name: ");
-
-  player.name = playerName;
-  
+  playerid = makeid(20);
+  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName, playerid);
 
   player.broadcastData(true);
 }
@@ -93,7 +101,7 @@ function setup() {
   frameRate(165);
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("game");
-  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, "", socket.id);
+  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName, playerid);
   camera = new Camera(0.2);
 }
 
