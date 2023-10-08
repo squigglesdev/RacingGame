@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://longhope.ddns.net:8080")
+const socket = new WebSocket("wss://server.squiggles.dev")
 
 let player;
 let camera;
@@ -24,7 +24,7 @@ socket.addEventListener('message', function (event) {
   const data = JSON.parse(event.data);
   //console.log(data);
 
-  if (data.name !== playerName) {
+  if (data.id !== playerName) {
     if (data.type === 'newPlayer') {
       handleNewPlayer(data);
     } else if (data.type === 'updatePlayer') {
@@ -37,16 +37,16 @@ socket.addEventListener('message', function (event) {
 
 function handleNewPlayer(data) {
   // Create a new player object for the new player
-  otherPlayers[data.name] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.01, 1, data.name);
+  otherPlayers[data.id] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.01, 1, data.name, data.id);
   console.log(otherPlayers);
 }
 
 function handleUpdatePlayer(data) {
   // Update the position and angle of an existing player
-  if (otherPlayers[data.name]) {
-    otherPlayers[data.name].pos.x = data.pos.x;
-    otherPlayers[data.name].pos.y = data.pos.y;
-    otherPlayers[data.name].angle = data.angle;
+  if (otherPlayers[data.id]) {
+    otherPlayers[data.id].pos.x = data.pos.x;
+    otherPlayers[data.id].pos.y = data.pos.y;
+    otherPlayers[data.id].angle = data.angle;
   } else {
     handleNewPlayer(data);
   }
@@ -54,8 +54,8 @@ function handleUpdatePlayer(data) {
 
 function handlePlayerDisconnect(data) {
   // Remove the disconnected player from the local game state
-  if (otherPlayers[data.name]) {
-      delete otherPlayers[data.name];
+  if (otherPlayers[data.id]) {
+      delete otherPlayers[data.id];
   }
 }
 
@@ -83,8 +83,8 @@ function preload() {
 function initializeGame() {
   playerName = prompt("Enter your name: ");
 
-  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName);
-  camera = new Camera(0.2);
+  player.name = playerName;
+  
 
   player.broadcastData(true);
 }
@@ -93,6 +93,8 @@ function setup() {
   frameRate(165);
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("game");
+  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, "", socket.id);
+  camera = new Camera(0.2);
 }
 
 let gridSpacing = 40;

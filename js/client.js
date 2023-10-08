@@ -1,7 +1,7 @@
 
 
 class Client {
-    constructor(x, y, size, acceleration, deceleration, maxSpeed, rotationSpeed, speedMultiplier, name) {
+    constructor(x, y, size, acceleration, deceleration, maxSpeed, rotationSpeed, speedMultiplier, name, id) {
     	this.pos = createVector(x, y);
     	this.size = size;
     	this.acceleration = acceleration;
@@ -14,6 +14,7 @@ class Client {
 		this.prevPos = createVector(x, y);
 		this.prevAngle = this.angle;
 		this.name = name;
+		this.id = id;
     }
 
 	broadcastData(open) {
@@ -21,6 +22,7 @@ class Client {
 		if (open) {
 			const data = {
 				type: 'newPlayer',
+				id: this.id,
 				name: this.name,
 				pos: this.pos,
 				angle: this.angle
@@ -29,6 +31,7 @@ class Client {
 		} else if (this.pos.x !== this.prevPos.x || this.pos.y !== this.prevPos.y || this.angle !== this.prevAngle) {
             const data = {
 				type: 'updatePlayer',
+				id: this.id,
 				name: this.name,
                 pos: this.pos,
                 angle: this.angle
