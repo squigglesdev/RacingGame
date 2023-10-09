@@ -11,7 +11,14 @@ class Camera {
     }
 
     zoomTo(value) {
-        this.zoom += 0.5;
-        this = max( 0, min(this.zoom, value) )
+        const newZoom = constrain(value, 50, 300); // Set the maximum zoom level as needed
+        const factor = newZoom / this.zoom;
+        
+        // Adjust the position to keep the target centered
+        this.pos.x -= (width / 2 - this.pos.x) * (factor - 1);
+        this.pos.y -= (height / 2 - this.pos.y) * (factor - 1);
+    
+        this.zoom = newZoom;
     }
+    
 }

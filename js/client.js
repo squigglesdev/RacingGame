@@ -51,10 +51,10 @@ class Client {
 		let speed = this.currentSpeed.mag();
 	
 		if (keyIsDown(37)) {
-			this.angle -= this.rotationSpeed * (speed / this.maxSpeed);
+			this.angle -= this.rotationSpeed * (speed / this.maxSpeed) * dt;
 		}
 		if (keyIsDown(39)) {
-			this.angle += this.rotationSpeed * (speed / this.maxSpeed);
+			this.angle += this.rotationSpeed * (speed / this.maxSpeed) * dt;
 		}
 		if (keyIsDown(38)) {
 			localAcceleration.y -= (this.acceleration + speed * 0.1) * dt;
