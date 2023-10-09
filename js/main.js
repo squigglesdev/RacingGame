@@ -54,7 +54,7 @@ function preload() {
 
   function handleNewPlayer(data) {
     // Create a new player object for the new player
-    otherPlayers[data.id] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.01, 1, data.name, data.id);
+    otherPlayers[data.id] = new Client(data.pos.x, data.pos.y, 40, 800, 800, 300, 0.05, 1.5, data.name, data.id);
     console.log(otherPlayers);
   }
 
@@ -92,7 +92,7 @@ function preload() {
 function initializeGame() {
   playerName = prompt("Enter your name: ");
   playerid = makeid(20);
-  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName, playerid);
+  player = new Client(0, 0, 40, 800, 800, 300, 0.05, 1.5, playerName, playerid);
 
   player.broadcastData(true);
 }
@@ -101,7 +101,7 @@ function setup() {
   frameRate(165);
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("game");
-  player = new Client(0, 0, 40, 800, 800, 300, 0.01, 1, playerName, playerid);
+  player = new Client(0, 0, 40, 800, 800, 300, 0.05, 1.5, playerName, playerid);
   camera = new Camera(0.2);
 }
 
