@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: 8080, host: '0.0.0.0' });
 const clients = {};
+const clientLastUpdate = new Map();
 
 wss.on('connection', (ws) => {
     ws.on('message', (message) => {
@@ -48,6 +49,9 @@ function broadcastNewPlayer(data) {
 }
 
 function broadcastUpdatePlayer(data) {
+    // Update last update timestamp for the client
+    clientLastUpdate.set(data.id, Date.now());
+
     // Broadcast player position and angle updates to all clients except the sender
     console.log("Update player: " + data.id);
     wss.clients.forEach((client) => {
@@ -56,6 +60,7 @@ function broadcastUpdatePlayer(data) {
         }
     });
 }
+
 
 function broadcastPlayerDisconnect(data) {
     // Broadcast player disconnection to all clients except the sender
@@ -66,3 +71,22 @@ function broadcastPlayerDisconnect(data) {
         }
     });
 }
+
+// Check for inactive clients every 2 minutes (120,000 milliseconds)
+setInterval(() => {
+    const currentTime = Date.now();
+    clientLastUpdate.forEach((timestamp, clientId) => {
+        if (currentTime - timestamp > 120000) {
+            // Client has not sent updates in over 2 minutes, disconnect them
+            console.log(`Client ${clientId} disconnected due to inactivity.`);
+            const disconnectedClient = clients[clientId];
+            if (disconnectedClient && disconnectedClient.readyState === WebSocket.OPEN) {
+                disconnectedClient.send(JSON.stringify({ type: 'serverDisconnect' }));
+                disconnectedClient.close();
+            }
+            // Remove the client from the data structures
+            delete clients[clientId];
+            clientLastUpdate.delete(clientId);
+        }
+    });
+}, 120000); // Check every 2 minutes
