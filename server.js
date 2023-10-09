@@ -82,6 +82,7 @@ setInterval(() => {
             const disconnectedClient = clients[clientId];
             if (disconnectedClient && disconnectedClient.readyState === WebSocket.OPEN) {
                 disconnectedClient.send(JSON.stringify({ type: 'serverDisconnect' }));
+                broadcastPlayerDisconnect(disconnectedClient);
                 disconnectedClient.close();
             }
             // Remove the client from the data structures
