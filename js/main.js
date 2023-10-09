@@ -115,6 +115,7 @@ function draw() {
   camera.follow(player);
 
   translate(width / 2 - camera.pos.x, height / 2 - camera.pos.y);
+  scale(camera.zoom / 100);
 
   drawGrid(camera.pos.x, camera.pos.y, width, height, 40);
 
