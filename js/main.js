@@ -48,6 +48,8 @@ function preload() {
         handleUpdatePlayer(data);
       } else if (data.type === 'playerDisconnect') {
         handlePlayerDisconnect(data);
+      } else if (data.type === 'serverDisconnect') {
+        alert("You were kicked for inactivity.");
       }
     }
   });
